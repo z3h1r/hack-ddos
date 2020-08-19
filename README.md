@@ -1,1 +1,1 @@
-# hack-ddos
+# Modern hack of service kit
